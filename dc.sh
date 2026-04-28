@@ -260,8 +260,8 @@ _tui_select() {
     IFS= read -rsn1 key
     if [[ $key == $'\x1b' ]]; then
       local k2 k3
-      IFS= read -rsn1 -t 0 k2 || k2=""
-      IFS= read -rsn1 -t 0 k3 || k3=""
+      IFS= read -rsn1 -t 1 k2 || k2=""
+      IFS= read -rsn1 -t 1 k3 || k3=""
       rest="${k2}${k3}"
       case "$rest" in
         '[A')
