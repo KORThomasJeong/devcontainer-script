@@ -119,25 +119,47 @@ cmd_up() {
   echo ""
   echo -e "${BOLD}${CYAN}━━ dc up · ${name} ━━${NC}"
 
+  # 1) DB / Redis 시작
   info "DB / Redis 시작 중..."
   compose_cmd "$num" up -d --remove-orphans
   success "PostgreSQL :${pg}  Redis :${redis:-없음}"
 
-  if command -v devcontainer &>/dev/null; then
-    info "앱 컨테이너(devcontainer) 시작 중..."
-    devcontainer up --workspace-folder "$SCRIPT_DIR/${name}" 2>/dev/null \
-      && success "devcontainer 준비 완료" \
-      || warn "devcontainer CLI 실패 — DB/Redis는 정상 실행 중"
-  else
-    warn "devcontainer CLI 없음. start.sh 를 먼저 실행하면 자동 설치됩니다."
+  # 2) code-server 자동 시작 (없으면 띄우기)
+  if ! docker ps --format '{{.Names}}' | grep -q "^${CODE_SERVER_NAME}$"; then
+    info "IDE(code-server) 자동 시작 중..."
+    cmd_ide
   fi
 
+  # 3) code-server 안에서 해당 샘플 폴더 열기
+  local workspace_path="/home/coder/workspace/${name}"
+  docker exec "${CODE_SERVER_NAME}" \
+    code-server --install-extension ms-vscode-remote.remote-containers \
+    &>/dev/null || true
+  # code-server REST API로 폴더 열기
+  docker exec "${CODE_SERVER_NAME}" \
+    wget -qO- "http://localhost:8080/api/v0/open?path=${workspace_path}" \
+    &>/dev/null || true
+
+  local host_ip
+  host_ip=$(ipconfig getifaddr en0 2>/dev/null || echo "localhost")
+
   echo ""
-  echo -e "${BOLD}  접속 정보${NC}"
-  echo -e "  PostgreSQL  →  localhost:${pg}  (dev / devpassword)"
-  [[ -n "$redis" ]] && echo -e "  Redis       →  localhost:${redis}"
-  echo -e "  IDE         →  ${CYAN}http://localhost:${CODE_SERVER_PORT}${NC}  (./dc.sh ide 로 시작)"
+  echo -e "${BOLD}━━ 접속 정보 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  echo -e "  ${CYAN}브라우저 IDE${NC}"
+  echo -e "    http://localhost:${CODE_SERVER_PORT}/?folder=${workspace_path}"
+  echo -e "    http://${host_ip}:${CODE_SERVER_PORT}/?folder=${workspace_path}"
   echo ""
+  echo -e "  ${CYAN}데이터베이스${NC}"
+  echo -e "    PostgreSQL  localhost:${pg}  (dev / devpassword)"
+  [[ -n "$redis" ]] && echo -e "    Redis       localhost:${redis}"
+  echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  echo ""
+
+  # 브라우저 자동 열기 (macOS)
+  local url="http://localhost:${CODE_SERVER_PORT}/?folder=${workspace_path}"
+  if command -v open &>/dev/null; then
+    open "$url" 2>/dev/null || true
+  fi
 }
 
 # ── down ────────────────────────────────────────────────────────
@@ -249,25 +271,19 @@ _tui_render() {
 _tui_select() {
   local total=${#TUI_ITEMS[@]}
   TUI_RESULT=0
-
   tput civis 2>/dev/null || true
   trap 'tput cnorm 2>/dev/null; printf "\n"; exit 130' INT TERM
-
   _tui_render
-
   while true; do
-    local key rest
+    local key k2 k3 rest
     IFS= read -rsn1 key
     if [[ $key == $'\x1b' ]]; then
-      local k2 k3
       IFS= read -rsn1 -t 1 k2 || k2=""
       IFS= read -rsn1 -t 1 k3 || k3=""
       rest="${k2}${k3}"
       case "$rest" in
-        '[A')
-          [[ $TUI_RESULT -gt 0 ]] && TUI_RESULT=$((TUI_RESULT - 1)) || continue ;;
-        '[B')
-          [[ $TUI_RESULT -lt $((total - 1)) ]] && TUI_RESULT=$((TUI_RESULT + 1)) || continue ;;
+        '[A') [[ $TUI_RESULT -gt 0 ]] && TUI_RESULT=$((TUI_RESULT - 1)) || continue ;;
+        '[B') [[ $TUI_RESULT -lt $((total-1)) ]] && TUI_RESULT=$((TUI_RESULT + 1)) || continue ;;
         *) continue ;;
       esac
     elif [[ $key == '' ]]; then
@@ -277,12 +293,9 @@ _tui_select() {
     else
       continue
     fi
-
-    # total줄 위로 이동 후 아래 전체 지우고 재렌더링
     printf '\033[%dA\033[J' "$total"
     _tui_render
   done
-
   tput cnorm 2>/dev/null
 }
 
@@ -294,14 +307,12 @@ cmd_menu() {
     echo -e "${BOLD}${CYAN}  ║     Devcontainer Manager  dc.sh      ║${NC}"
     echo -e "${BOLD}${CYAN}  ╚══════════════════════════════════════╝${NC}"
     echo ""
-
     if docker ps --format '{{.Names}}' | grep -q "^${CODE_SERVER_NAME}$" 2>/dev/null; then
       echo -e "  ${GREEN}● IDE${NC}  http://localhost:${CODE_SERVER_PORT}"
     else
       echo -e "  ${RED}○ IDE${NC}  중지됨"
     fi
     echo ""
-
     TUI_ITEMS=(
       "IDE 시작 / 열기  (code-server :8080)"
       "전체 상태 보기"
@@ -314,11 +325,9 @@ cmd_menu() {
       "IDE 종료"
       "종료"
     )
-
     _tui_select
     local sel=$TUI_RESULT
     echo ""
-
     case $sel in
       0) cmd_ide; echo ""; read -rp "  [Enter 계속]" || true ;;
       1) cmd_status; read -rp "  [Enter 계속]" || true ;;
@@ -336,7 +345,6 @@ cmd_menu() {
 
 _menu_pick_sample() {
   local action="$1"
-
   TUI_ITEMS=(
     "01  Admin Dashboard      PG:5401  Redis:6301"
     "02  B2C Web Service      PG:5402  Redis:6302"
@@ -346,16 +354,12 @@ _menu_pick_sample() {
     "06  Data Pipeline        PG:5406  Redis:6306"
     "<-- 돌아가기"
   )
-
   _tui_select
   local sel=$TUI_RESULT
   echo ""
-
   [[ $sel -eq 6 ]] && return
-
   local num
   num=$(printf '%02d' $((sel + 1)))
-
   case "$action" in
     up)      cmd_up "$num" ;;
     down)    cmd_down "$num" ;;
@@ -363,7 +367,6 @@ _menu_pick_sample() {
     logs)    cmd_logs "$num" ;;
     shell)   cmd_shell "$num" ;;
   esac
-
   echo ""
   read -rp "  [Enter 계속]" || true
 }
