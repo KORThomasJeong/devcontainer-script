@@ -6,20 +6,20 @@
 <title>Devcontainer Samples</title>
 <style>
   :root {
-    --bg:        #0d0f14;
-    --surface:   #13161e;
-    --surface2:  #1a1e2a;
-    --border:    #252b3b;
-    --border2:   #2e3650;
-    --text:      #c8d0e8;
-    --muted:     #5c6687;
-    --green:     #4af18e;
-    --cyan:      #38c0d8;
-    --blue:      #4c8ef7;
-    --purple:    #9d7bea;
-    --amber:     #f0b429;
-    --red:       #f26f63;
-    --white:     #eef1f8;
+    --bg:        #f4f6fb;
+    --surface:   #ffffff;
+    --surface2:  #eef1f8;
+    --border:    #dde2f0;
+    --border2:   #bec8e4;
+    --text:      #2c3556;
+    --muted:     #7c89ad;
+    --green:     #16a34a;
+    --cyan:      #0284c7;
+    --blue:      #2563eb;
+    --purple:    #7c3aed;
+    --amber:     #b45309;
+    --red:       #dc2626;
+    --white:     #1a2340;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -54,7 +54,7 @@
     content: '';
     position: fixed;
     inset: 0;
-    background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(76,142,247,0.08) 0%, transparent 70%);
+    background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(37,99,235,0.06) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
   }
@@ -215,7 +215,7 @@
   .card:hover {
     border-color: var(--border2);
     transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    box-shadow: 0 8px 32px rgba(44,53,86,0.10);
   }
   .card:hover::before { opacity: 1; }
 
@@ -427,7 +427,7 @@
     text-decoration: none;
     transition: color 0.2s;
   }
-  footer a:hover { color: var(--white); }
+  footer a:hover { color: var(--text); }
 
   /* ── 진입 애니메이션 ── */
   @keyframes fadeUp {
@@ -452,9 +452,10 @@
   #toast {
     position: fixed;
     bottom: 32px; right: 32px;
-    background: var(--surface2);
+    background: var(--surface);
     border: 1px solid var(--green);
     color: var(--green);
+    box-shadow: 0 4px 16px rgba(44,53,86,0.12);
     padding: 10px 18px;
     border-radius: 6px;
     font-size: 12px;
