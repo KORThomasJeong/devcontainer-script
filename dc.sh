@@ -252,9 +252,144 @@ cmd_help() {
   echo ""
 }
 
+# ── 인터랙티브 메뉴 ─────────────────────────────────────────────
+# 화살표 키로 항목 이동, Enter로 선택
+
+_tui_select() {
+  local -n _items=$1
+  local selected=0
+  local total=${#_items[@]}
+
+  # 커서 숨기기
+  tput civis 2>/dev/null || true
+  trap 'tput cnorm 2>/dev/null; echo ""; exit 130' INT TERM
+
+  while true; do
+    # 항목 렌더링
+    for i in "${!_items[@]}"; do
+      if [[ $i -eq $selected ]]; then
+        echo -e "  ${CYAN}▶${NC} ${BOLD}${_items[$i]}${NC}"
+      else
+        echo -e "    ${_items[$i]}"
+      fi
+    done
+
+    # 키 입력 읽기
+    local key
+    IFS= read -rsn1 key
+    if [[ $key == $'\x1b' ]]; then
+      read -rsn2 -t 0.1 key
+      case "$key" in
+        '[A') ((selected > 0)) && ((selected--)) ;;         # 위
+        '[B') ((selected < total-1)) && ((selected++)) ;;   # 아래
+      esac
+    elif [[ $key == '' ]]; then
+      break  # Enter
+    elif [[ $key == 'q' || $key == $'\x03' ]]; then
+      tput cnorm 2>/dev/null; echo ""; exit 0
+    fi
+
+    # 렌더링된 줄 지우기
+    for _ in "${!_items[@]}"; do
+      tput cuu1 2>/dev/null; tput el 2>/dev/null
+    done
+  done
+
+  tput cnorm 2>/dev/null
+  echo "$selected"
+}
+
+cmd_menu() {
+  while true; do
+    clear
+    echo ""
+    echo -e "${BOLD}${CYAN}  ╔══════════════════════════════════════╗${NC}"
+    echo -e "${BOLD}${CYAN}  ║     Devcontainer Manager  dc.sh      ║${NC}"
+    echo -e "${BOLD}${CYAN}  ╚══════════════════════════════════════╝${NC}"
+    echo ""
+
+    # IDE 상태 표시
+    if docker ps --format '{{.Names}}' | grep -q "^${CODE_SERVER_NAME}$" 2>/dev/null; then
+      echo -e "  ${GREEN}● IDE${NC}  http://localhost:${CODE_SERVER_PORT}"
+    else
+      echo -e "  ${RED}○ IDE${NC}  중지됨"
+    fi
+    echo ""
+
+    local actions=(
+      "🌐  IDE 시작 / 열기  (code-server :8080)"
+      "📊  전체 상태 보기"
+      "▶   샘플 시작  (up)"
+      "■   샘플 종료  (down)"
+      "↺   샘플 재시작"
+      "📋  로그 보기"
+      "🖥️   쉘 접속"
+      "🐳  실행 컨테이너 목록"
+      "✕   IDE 종료"
+      "──  종료"
+    )
+
+    local sel
+    sel=$(_tui_select actions)
+    echo ""
+
+    case $sel in
+      0) cmd_ide ;;
+      1) cmd_status; read -rp "  [Enter 계속]" ;;
+      2) _menu_pick_sample "up" ;;
+      3) _menu_pick_sample "down" ;;
+      4) _menu_pick_sample "restart" ;;
+      5) _menu_pick_sample "logs" ;;
+      6) _menu_pick_sample "shell" ;;
+      7) cmd_ps; read -rp "  [Enter 계속]" ;;
+      8) cmd_ide_stop ;;
+      9) echo ""; exit 0 ;;
+    esac
+  done
+}
+
+_menu_pick_sample() {
+  local action="$1"
+  local samples=(
+    "01  Admin Dashboard      PG:5401  Redis:6301"
+    "02  B2C Web Service      PG:5402  Redis:6302"
+    "03  AI/ML API            PG:5403  Redis:6303"
+    "04  Mobile App           PG:5404"
+    "05  Node Microservice    PG:5405  Redis:6305"
+    "06  Data Pipeline        PG:5406  Redis:6306"
+    "←  돌아가기"
+  )
+
+  echo -e "  ${BOLD}샘플 선택${NC} (↑↓ 이동, Enter 확인)"
+  echo ""
+
+  local sel
+  sel=$(_tui_select samples)
+  echo ""
+
+  [[ $sel -eq 6 ]] && return  # 돌아가기
+
+  local num
+  num=$(printf '%02d' $((sel + 1)))
+
+  case "$action" in
+    up|down|restart|shell) cmd_${action} "$num" ;;
+    logs) cmd_logs "$num" ;;
+  esac
+
+  echo ""
+  read -rp "  [Enter 계속]" || true
+}
+
 # ── 메인 ────────────────────────────────────────────────────────
 main() {
-  local cmd="${1:-help}"; shift || true
+  # 인수 없으면 인터랙티브 메뉴
+  if [[ $# -eq 0 ]]; then
+    cmd_menu
+    return
+  fi
+
+  local cmd="$1"; shift
 
   case "$cmd" in
     ide)     [[ "${1:-}" == "stop" ]] && cmd_ide_stop || cmd_ide ;;
