@@ -259,7 +259,10 @@ _tui_select() {
     local key rest
     IFS= read -rsn1 key
     if [[ $key == $'\x1b' ]]; then
-      read -rsn2 -t 0.1 rest || true
+      local k2 k3
+      IFS= read -rsn1 -t 0 k2 || k2=""
+      IFS= read -rsn1 -t 0 k3 || k3=""
+      rest="${k2}${k3}"
       case "$rest" in
         '[A')
           [[ $TUI_RESULT -gt 0 ]] && TUI_RESULT=$((TUI_RESULT - 1)) || continue ;;
