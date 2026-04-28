@@ -238,9 +238,9 @@ _tui_render() {
   local i=0
   while [[ $i -lt ${#TUI_ITEMS[@]} ]]; do
     if [[ $i -eq $TUI_RESULT ]]; then
-      echo -e "  ${CYAN}▶${NC} ${BOLD}${TUI_ITEMS[$i]}${NC}"
+      printf "  \033[36m▶\033[0m \033[1m%s\033[0m\n" "${TUI_ITEMS[$i]}"
     else
-      echo -e "    ${TUI_ITEMS[$i]}"
+      printf "    %s\n" "${TUI_ITEMS[$i]}"
     fi
     i=$((i + 1))
   done
@@ -251,7 +251,7 @@ _tui_select() {
   TUI_RESULT=0
 
   tput civis 2>/dev/null || true
-  trap 'tput cnorm 2>/dev/null; echo ""; exit 130' INT TERM
+  trap 'tput cnorm 2>/dev/null; printf "\n"; exit 130' INT TERM
 
   _tui_render
 
@@ -261,20 +261,22 @@ _tui_select() {
     if [[ $key == $'\x1b' ]]; then
       read -rsn2 -t 0.1 rest || true
       case "$rest" in
-        '[A') [[ $TUI_RESULT -gt 0 ]] && TUI_RESULT=$((TUI_RESULT - 1)) ;;
-        '[B') [[ $TUI_RESULT -lt $((total - 1)) ]] && TUI_RESULT=$((TUI_RESULT + 1)) ;;
+        '[A')
+          [[ $TUI_RESULT -gt 0 ]] && TUI_RESULT=$((TUI_RESULT - 1)) || continue ;;
+        '[B')
+          [[ $TUI_RESULT -lt $((total - 1)) ]] && TUI_RESULT=$((TUI_RESULT + 1)) || continue ;;
+        *) continue ;;
       esac
     elif [[ $key == '' ]]; then
       break
     elif [[ $key == 'q' ]]; then
-      tput cnorm 2>/dev/null; echo ""; exit 0
+      tput cnorm 2>/dev/null; printf "\n"; exit 0
+    else
+      continue
     fi
 
-    local i=0
-    while [[ $i -lt $total ]]; do
-      tput cuu1 2>/dev/null; tput el 2>/dev/null
-      i=$((i + 1))
-    done
+    # total줄 위로 이동 후 아래 전체 지우고 재렌더링
+    printf '\033[%dA\033[J' "$total"
     _tui_render
   done
 
@@ -331,9 +333,6 @@ cmd_menu() {
 
 _menu_pick_sample() {
   local action="$1"
-
-  echo -e "  ${BOLD}샘플 선택${NC}  (↑↓ 이동, Enter 확인, q 취소)"
-  echo ""
 
   TUI_ITEMS=(
     "01  Admin Dashboard      PG:5401  Redis:6301"
