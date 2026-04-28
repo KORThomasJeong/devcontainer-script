@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devcontainer Samples</title>
+<style>
+  :root {
+    --bg:        #0d0f14;
+    --surface:   #13161e;
+    --surface2:  #1a1e2a;
+    --border:    #252b3b;
+    --border2:   #2e3650;
+    --text:      #c8d0e8;
+    --muted:     #5c6687;
+    --green:     #4af18e;
+    --cyan:      #38c0d8;
+    --blue:      #4c8ef7;
+    --purple:    #9d7bea;
+    --amber:     #f0b429;
+    --red:       #f26f63;
+    --white:     #eef1f8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Courier New', 'Menlo', 'Monaco', 'Consolas', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── 배경 그리드 패턴 ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(76,142,247,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── 상단 바 ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .topbar .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-red    { background: #f26f63; }
+  .dot-amber  { background: #f0b429; }
+  .dot-green  { background: #4af18e; }
+  .topbar .path { margin-left: 12px; color: var(--muted); letter-spacing: 0.03em; }
+  .topbar .path span { color: var(--cyan); }
+
+  /* ── 히어로 ── */
+  .hero {
+    padding: 64px 0 48px;
+    position: relative;
+  }
+
+  .hero-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 20px;
+  }
+  .hero-label::before {
+    content: '';
+    display: block;
+    width: 20px; height: 1px;
+    background: var(--green);
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--white);
+    letter-spacing: -0.02em;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--cyan);
+  }
+
+  .hero-sub {
+    margin-top: 14px;
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 520px;
+  }
+
+  .hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 32px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .hero-meta .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--text);
+    transition: border-color 0.2s;
+  }
+  .hero-meta .badge:hover { border-color: var(--cyan); }
+  .badge-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
+  /* ── 섹션 헤더 ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    margin-top: 56px;
+  }
+  .section-header h2 {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .section-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-num {
+    font-size: 11px;
+    color: var(--border2);
+    min-width: 24px;
+  }
+
+  /* ── 카드 그리드 ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent, var(--cyan)), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .card:hover {
+    border-color: var(--border2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .card:hover::before { opacity: 1; }
+
+  /* 카드별 accent 색상 */
+  .card[data-color="green"]  { --accent: var(--green); }
+  .card[data-color="blue"]   { --accent: var(--blue); }
+  .card[data-color="cyan"]   { --accent: var(--cyan); }
+  .card[data-color="amber"]  { --accent: var(--amber); }
+  .card[data-color="purple"] { --accent: var(--purple); }
+  .card[data-color="red"]    { --accent: var(--red); }
+
+  .card-num {
+    position: absolute;
+    top: 20px; right: 20px;
+    font-size: 11px;
+    color: var(--border2);
+    letter-spacing: 0.05em;
+  }
+
+  .card-icon {
+    font-size: 22px;
+    margin-bottom: 14px;
+    line-height: 1;
+  }
+
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+  .tag {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    letter-spacing: 0.04em;
+  }
+  .tag.accent {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+    color: var(--accent);
+  }
+
+  .port-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .port-label { color: var(--muted); }
+  .port-value {
+    font-size: 12px;
+    color: var(--accent, var(--cyan));
+    font-weight: 600;
+    padding: 2px 8px;
+    background: color-mix(in srgb, var(--accent, var(--cyan)) 10%, transparent);
+    border-radius: 3px;
+  }
+
+  /* ── 퀵스타트 ── */
+  .quickstart {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .step:hover { border-color: var(--border2); }
+
+  .step-num {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .step h3 {
+    font-size: 13px;
+    color: var(--white);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .step p {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  code, .code-block {
+    font-family: inherit;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 12px;
+    color: var(--green);
+  }
+  .code-block {
+    display: block;
+    padding: 12px 16px;
+    margin-top: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .code-block::before {
+    content: '$ ';
+    color: var(--muted);
+  }
+
+  /* ── Claude 섹션 ── */
+  .claude-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--purple);
+    border-radius: 8px;
+    padding: 28px 32px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+  }
+  @media (max-width: 600px) {
+    .claude-box { grid-template-columns: 1fr; }
+  }
+  .claude-box h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .claude-box p {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .claude-cmd {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--purple);
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .claude-cmd:hover {
+    border-color: var(--purple);
+    box-shadow: 0 0 16px rgba(157,123,234,0.2);
+    transform: scale(1.02);
+  }
+  .claude-cmd::before { content: '$ '; color: var(--muted); }
+  .copy-hint {
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 6px;
+  }
+
+  /* ── 푸터 ── */
+  footer {
+    margin-top: 72px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .footer-left { display: flex; align-items: center; gap: 16px; }
+  footer a {
+    color: var(--cyan);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  footer a:hover { color: var(--white); }
+
+  /* ── 진입 애니메이션 ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero         { animation: fadeUp 0.5s ease both; }
+  .card         { animation: fadeUp 0.5s ease both; }
+  .card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2) { animation-delay: 0.10s; }
+  .card:nth-child(3) { animation-delay: 0.15s; }
+  .card:nth-child(4) { animation-delay: 0.20s; }
+  .card:nth-child(5) { animation-delay: 0.25s; }
+  .card:nth-child(6) { animation-delay: 0.30s; }
+  .step         { animation: fadeUp 0.5s ease both; }
+  .step:nth-child(1) { animation-delay: 0.35s; }
+  .step:nth-child(2) { animation-delay: 0.40s; }
+  .step:nth-child(3) { animation-delay: 0.45s; }
+  .claude-box   { animation: fadeUp 0.5s 0.5s ease both; }
+
+  /* ── copy toast ── */
+  #toast {
+    position: fixed;
+    bottom: 32px; right: 32px;
+    background: var(--surface2);
+    border: 1px solid var(--green);
+    color: var(--green);
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 12px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.2s;
+    pointer-events: none;
+    z-index: 100;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- 상단 바 -->
+  <div class="topbar">
+    <div class="dot dot-red"></div>
+    <div class="dot dot-amber"></div>
+    <div class="dot dot-green"></div>
+    <span class="path">~/<span>devcontainer-script</span>/index.html</span>
+  </div>
+
+  <!-- 히어로 -->
+  <section class="hero">
+    <div class="hero-label">INTERNAL TOOLS</div>
+    <h1>Devcontainer<br><em>Samples</em></h1>
+    <p class="hero-sub">Claude Code 포함 개발 환경 모음 — 컨테이너 진입 즉시 AI 코딩 시작</p>
+    <div class="hero-meta">
+      <div class="badge"><span class="badge-dot"></span> 6 Environments</div>
+      <div class="badge">Claude Code CLI 내장</div>
+      <div class="badge">Docker + VS Code</div>
+    </div>
+  </section>
+
+  <!-- 샘플 카드 -->
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>샘플 환경</h2>
+  </div>
+
+  <div class="grid">
+
+    <div class="card" data-color="green">
+      <span class="card-num">001</span>
+      <div class="card-icon">⬡</div>
+      <div class="card-title">Node.js + TypeScript</div>
+      <div class="card-desc">백엔드 API 개발 — Express, Fastify, NestJS 등 즉시 사용 가능</div>
+      <div class="tags">
+        <span class="tag accent">Node.js 20</span>
+        <span class="tag accent">TypeScript</span>
+        <span class="tag">ESLint</span>
+        <span class="tag">Prettier</span>
+      </div>
+      <div class="port-row">
+        <span class="port-label">포트</span>
+        <span class="port-value">:3000</span>
+      </div>
+    </div>
+
+    <div class="card" data-color="blue">
+      <span class="card-num">002</span>
+      <div class="card-icon">◈</div>
+      <div class="card-title">Python + FastAPI</div>
+      <div class="card-desc">REST API — /docs 에서 Swagger UI 자동 생성, Pydantic v2 포함</div>
+      <div class="tags">
+        <span class="tag accent">Python 3.12</span>
+        <span class="tag accent">FastAPI</span>
+        <span class="tag">Uvicorn</span>
+        <span class="tag">Black</span>
+        <span class="tag">Ruff</span>
+      </div>
+      <div class="port-row">
+        <span class="port-label">포트</span>
+        <span class="port-value">:8000</span>
+      </div>
+    </div>
+
+    <div class="card" data-color="cyan">
+      <span class="card-num">003</span>
+      <div class="card-icon">▣</div>
+      <div class="card-title">Vite + React</div>
+      <div class="card-desc">프론트엔드 SPA — HMR 핫리로드, Tailwind CSS 지원</div>
+      <div class="tags">
+        <span class="tag accent">Vite</span>
+        <span class="tag accent">React 18</span>
+        <span class="tag">TypeScript</span>
+        <span class="tag">Tailwind</span>
+      </div>
+      <div class="port-row">
+        <span class="port-label">포트</span>
+        <span class="port-value">:5173</span>
+      </div>
+    </div>
+
+    <div class="card" data-color="amber">
+      <span class="card-num">004</span>
+      <div class="card-icon">◧</div>
+      <div class="card-title">HTML/CSS Dashboard</div>
+      <div class="card-desc">정적 대시보드 프로토타이핑 — 저장 즉시 브라우저 반영 (Live Server)</div>
+      <div class="tags">
+        <span class="tag accent">HTML5</span>
+        <span class="tag accent">CSS3</span>
+        <span class="tag">Live Server</span>
+        <span class="tag">Emmet</span>
+      </div>
+      <div class="port-row">
+        <span class="port-label">포트</span>
+        <span class="port-value">:5500</span>
+      </div>
+    </div>
+
+    <div class="card" data-color="purple">
+      <span class="card-num">005</span>
+      <div class="card-icon">◉</div>
+      <div class="card-title">Python Data Science</div>
+      <div class="card-desc">데이터 분석 — Jupyter Lab, pandas, matplotlib, scikit-learn 포함</div>
+      <div class="tags">
+        <span class="tag accent">Jupyter</span>
+        <span class="tag accent">pandas</span>
+        <span class="tag">numpy</span>
+        <span class="tag">matplotlib</span>
+        <span class="tag">sklearn</span>
+      </div>
+      <div class="port-row">
+        <span class="port-label">포트</span>
+        <span class="port-value">:8888</span>
+      </div>
+    </div>
+
+    <div class="card" data-color="red">
+      <span class="card-num">006</span>
+      <div class="card-icon">⬡</div>
+      <div class="card-title">Full-Stack</div>
+      <div class="card-desc">Node.js + Python 동시 개발 — 프론트엔드·백엔드 통합 환경</div>
+      <div class="tags">
+        <span class="tag accent">Node.js 20</span>
+        <span class="tag accent">Python 3.12</span>
+        <span class="tag">FastAPI</span>
+        <span class="tag">Vite</span>
+      </div>
+      <div class="port-row">
+        <span class="port-label">포트</span>
+        <span class="port-value">:5173</span>
+        <span class="port-value">:8000</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 퀵스타트 -->
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>빠른 시작</h2>
+  </div>
+
+  <div class="quickstart">
+
+    <div class="step">
+      <div class="step-num">STEP 01</div>
+      <h3>Docker 실행</h3>
+      <p>Docker Desktop을 실행하고 엔진이 정상 동작하는지 확인합니다.</p>
+      <code class="code-block" style="display:block; margin-top:12px;">docker info</code>
+    </div>
+
+    <div class="step">
+      <div class="step-num">STEP 02</div>
+      <h3>스크립트 실행</h3>
+      <p>레포 루트에서 <code>start.sh</code>를 실행합니다. 샘플 선택 → 포트 자동 확인 → 컨테이너 시작까지 자동 처리됩니다.</p>
+      <code class="code-block" style="display:block; margin-top:12px;">./start.sh</code>
+    </div>
+
+    <div class="step">
+      <div class="step-num">STEP 03</div>
+      <h3>VS Code로 연결</h3>
+      <p>VS Code에서 <kbd>Cmd+Shift+P</kbd> → <code>Dev Containers: Attach to Running Container</code> 선택 후 개발 시작.</p>
+    </div>
+
+  </div>
+
+  <!-- Claude Code -->
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2>Claude Code 사용</h2>
+  </div>
+
+  <div class="claude-box">
+    <div>
+      <h3>컨테이너 안에서 바로 Claude Code 사용</h3>
+      <p>모든 샘플에는 <code>postCreateCommand</code>로 Claude Code CLI가 자동 설치됩니다.<br>
+      컨테이너 터미널에서 아래 명령어로 즉시 AI 코딩을 시작할 수 있습니다.<br>
+      최초 실행 시 Anthropic 계정 인증 또는 API 키를 입력합니다.</p>
+    </div>
+    <div style="text-align:center;">
+      <div class="claude-cmd" onclick="copyCmd(this)" title="클릭하여 복사">claude</div>
+      <div class="copy-hint">클릭하여 복사</div>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <footer>
+    <div class="footer-left">
+      <span>Devcontainer Samples</span>
+      <a href="https://github.com/KORThomasJeong/devcontainer-script" target="_blank">github.com/KORThomasJeong/devcontainer-script</a>
+    </div>
+    <span>Built with Claude Code</span>
+  </footer>
+
+</div>
+
+<!-- Toast -->
+<div id="toast">복사되었습니다!</div>
+
+<script>
+function copyCmd(el) {
+  navigator.clipboard.writeText('claude').then(() => {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1800);
+  });
+}
+
+// 카드 hover 시 accent 색상 테두리 효과 강화
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    card.style.setProperty('--mx', x + '%');
+    card.style.setProperty('--my', y + '%');
+  });
+});
+</script>
+</body>
+</html>
