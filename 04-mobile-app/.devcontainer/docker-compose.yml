@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/python:3.12
+    volumes:
+      - ../:/workspace:cached
+    command: sleep infinity
+    environment:
+      DATABASE_URL: postgresql+asyncpg://dev:devpassword@db:5432/mobiledb
+    depends_on:
+      - db
+    # Expo는 호스트 네트워크 모드가 필요할 수 있음 (QR 코드 스캔)
+    network_mode: host
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: mobiledb
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres-data:

@@ -503,108 +503,114 @@
 
   <div class="grid">
 
-    <div class="card" data-color="green">
-      <span class="card-num">001</span>
-      <div class="card-icon">⬡</div>
-      <div class="card-title">Node.js + TypeScript</div>
-      <div class="card-desc">백엔드 API 개발 — Express, Fastify, NestJS 등 즉시 사용 가능</div>
-      <div class="tags">
-        <span class="tag accent">Node.js 20</span>
-        <span class="tag accent">TypeScript</span>
-        <span class="tag">ESLint</span>
-        <span class="tag">Prettier</span>
-      </div>
-      <div class="port-row">
-        <span class="port-label">포트</span>
-        <span class="port-value">:3000</span>
-      </div>
-    </div>
-
     <div class="card" data-color="blue">
-      <span class="card-num">002</span>
+      <span class="card-num">001</span>
       <div class="card-icon">◈</div>
-      <div class="card-title">Python + FastAPI</div>
-      <div class="card-desc">REST API — /docs 에서 Swagger UI 자동 생성, Pydantic v2 포함</div>
+      <div class="card-title">Admin Dashboard</div>
+      <div class="card-desc">사내 어드민 / 데이터 대시보드 — Vite+React 프론트 + FastAPI 백엔드 + DB 풀셋</div>
       <div class="tags">
-        <span class="tag accent">Python 3.12</span>
+        <span class="tag accent">Vite + React</span>
         <span class="tag accent">FastAPI</span>
-        <span class="tag">Uvicorn</span>
-        <span class="tag">Black</span>
-        <span class="tag">Ruff</span>
-      </div>
-      <div class="port-row">
-        <span class="port-label">포트</span>
-        <span class="port-value">:8000</span>
-      </div>
-    </div>
-
-    <div class="card" data-color="cyan">
-      <span class="card-num">003</span>
-      <div class="card-icon">▣</div>
-      <div class="card-title">Vite + React</div>
-      <div class="card-desc">프론트엔드 SPA — HMR 핫리로드, Tailwind CSS 지원</div>
-      <div class="tags">
-        <span class="tag accent">Vite</span>
-        <span class="tag accent">React 18</span>
-        <span class="tag">TypeScript</span>
-        <span class="tag">Tailwind</span>
+        <span class="tag">PostgreSQL 16</span>
+        <span class="tag">Redis 7</span>
       </div>
       <div class="port-row">
         <span class="port-label">포트</span>
         <span class="port-value">:5173</span>
+        <span class="port-value">:8000</span>
+        <span class="port-value">:5432</span>
       </div>
     </div>
 
-    <div class="card" data-color="amber">
-      <span class="card-num">004</span>
-      <div class="card-icon">◧</div>
-      <div class="card-title">HTML/CSS Dashboard</div>
-      <div class="card-desc">정적 대시보드 프로토타이핑 — 저장 즉시 브라우저 반영 (Live Server)</div>
+    <div class="card" data-color="green">
+      <span class="card-num">002</span>
+      <div class="card-icon">▣</div>
+      <div class="card-title">B2C 웹서비스</div>
+      <div class="card-desc">고객향 서비스 — SSR, SEO, NextAuth 인증, Prisma ORM 포함</div>
       <div class="tags">
-        <span class="tag accent">HTML5</span>
-        <span class="tag accent">CSS3</span>
-        <span class="tag">Live Server</span>
-        <span class="tag">Emmet</span>
+        <span class="tag accent">Next.js 14</span>
+        <span class="tag accent">Prisma</span>
+        <span class="tag">PostgreSQL 16</span>
+        <span class="tag">Redis 7</span>
       </div>
       <div class="port-row">
         <span class="port-label">포트</span>
-        <span class="port-value">:5500</span>
+        <span class="port-value">:3000</span>
+        <span class="port-value">:5432</span>
       </div>
     </div>
 
     <div class="card" data-color="purple">
-      <span class="card-num">005</span>
+      <span class="card-num">003</span>
       <div class="card-icon">◉</div>
-      <div class="card-title">Python Data Science</div>
-      <div class="card-desc">데이터 분석 — Jupyter Lab, pandas, matplotlib, scikit-learn 포함</div>
+      <div class="card-title">AI / ML API 서버</div>
+      <div class="card-desc">LLM 연동 API — pgvector 벡터 검색, Anthropic/OpenAI SDK, Jupyter 프로토타이핑</div>
       <div class="tags">
-        <span class="tag accent">Jupyter</span>
-        <span class="tag accent">pandas</span>
-        <span class="tag">numpy</span>
-        <span class="tag">matplotlib</span>
-        <span class="tag">sklearn</span>
+        <span class="tag accent">FastAPI</span>
+        <span class="tag accent">pgvector</span>
+        <span class="tag">Anthropic SDK</span>
+        <span class="tag">Redis 7</span>
       </div>
       <div class="port-row">
         <span class="port-label">포트</span>
+        <span class="port-value">:8000</span>
         <span class="port-value">:8888</span>
+        <span class="port-value">:5432</span>
+      </div>
+    </div>
+
+    <div class="card" data-color="cyan">
+      <span class="card-num">004</span>
+      <div class="card-icon">⬡</div>
+      <div class="card-title">모바일 앱</div>
+      <div class="card-desc">iOS/Android 앱 + API — Expo Go QR 스캔으로 실기기 즉시 테스트</div>
+      <div class="tags">
+        <span class="tag accent">Expo</span>
+        <span class="tag accent">React Native</span>
+        <span class="tag">FastAPI</span>
+        <span class="tag">PostgreSQL 16</span>
+      </div>
+      <div class="port-row">
+        <span class="port-label">포트</span>
+        <span class="port-value">:8081</span>
+        <span class="port-value">:8000</span>
+        <span class="port-value">:5432</span>
+      </div>
+    </div>
+
+    <div class="card" data-color="amber">
+      <span class="card-num">005</span>
+      <div class="card-icon">◧</div>
+      <div class="card-title">REST 마이크로서비스</div>
+      <div class="card-desc">고성능 Node.js API — Fastify + Drizzle ORM + BullMQ 작업 큐</div>
+      <div class="tags">
+        <span class="tag accent">Fastify</span>
+        <span class="tag accent">TypeScript</span>
+        <span class="tag">PostgreSQL 16</span>
+        <span class="tag">Redis 7</span>
+      </div>
+      <div class="port-row">
+        <span class="port-label">포트</span>
+        <span class="port-value">:3000</span>
+        <span class="port-value">:5432</span>
       </div>
     </div>
 
     <div class="card" data-color="red">
       <span class="card-num">006</span>
-      <div class="card-icon">⬡</div>
-      <div class="card-title">Full-Stack</div>
-      <div class="card-desc">Node.js + Python 동시 개발 — 프론트엔드·백엔드 통합 환경</div>
+      <div class="card-icon">◈</div>
+      <div class="card-title">데이터 파이프라인</div>
+      <div class="card-desc">ETL / 분석 — raw→staging→mart 스키마 분리, dbt, Jupyter, Great Expectations</div>
       <div class="tags">
-        <span class="tag accent">Node.js 20</span>
         <span class="tag accent">Python 3.12</span>
-        <span class="tag">FastAPI</span>
-        <span class="tag">Vite</span>
+        <span class="tag accent">dbt</span>
+        <span class="tag">PostgreSQL 16</span>
+        <span class="tag">Jupyter</span>
       </div>
       <div class="port-row">
         <span class="port-label">포트</span>
-        <span class="port-value">:5173</span>
-        <span class="port-value">:8000</span>
+        <span class="port-value">:8888</span>
+        <span class="port-value">:5432</span>
       </div>
     </div>
 

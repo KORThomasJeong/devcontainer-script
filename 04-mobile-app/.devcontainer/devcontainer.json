@@ -1,0 +1,33 @@
+{
+  "name": "Mobile App (Expo + FastAPI + PostgreSQL)",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [8081, 19000, 19001, 8000, 5432],
+  "portsAttributes": {
+    "8081": { "label": "Expo Dev Client", "onAutoForward": "notify" },
+    "19000": { "label": "Expo Go", "onAutoForward": "silent" },
+    "19001": { "label": "Expo Metro", "onAutoForward": "silent" },
+    "8000": { "label": "FastAPI Backend", "onAutoForward": "notify" },
+    "5432": { "label": "PostgreSQL", "onAutoForward": "silent" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        "msjsdiag.vscode-react-native",
+        "ms-python.python",
+        "ms-python.pylance",
+        "ms-python.black-formatter",
+        "42Crunch.vscode-openapi"
+      ],
+      "settings": {
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "postCreateCommand": "pip install fastapi 'uvicorn[standard]' sqlalchemy asyncpg alembic pydantic-settings python-dotenv && npm install -g @anthropic-ai/claude-code expo-cli",
+  "remoteUser": "vscode"
+}

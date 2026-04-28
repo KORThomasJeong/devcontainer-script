@@ -1,0 +1,35 @@
+{
+  "name": "Admin Dashboard (Vite+React + FastAPI + PostgreSQL + Redis)",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [5173, 8000, 5432, 6379],
+  "portsAttributes": {
+    "5173": { "label": "Vite Frontend", "onAutoForward": "notify" },
+    "8000": { "label": "FastAPI Backend", "onAutoForward": "notify" },
+    "5432": { "label": "PostgreSQL", "onAutoForward": "silent" },
+    "6379": { "label": "Redis", "onAutoForward": "silent" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.pylance",
+        "ms-python.black-formatter",
+        "charliermarsh.ruff",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "dsznajder.es7-react-js-snippets",
+        "bradlc.vscode-tailwindcss",
+        "42Crunch.vscode-openapi",
+        "cweijan.vscode-database-client2"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
+      }
+    }
+  },
+  "postCreateCommand": "pip install fastapi 'uvicorn[standard]' sqlalchemy asyncpg alembic redis pydantic-settings python-dotenv && npm install -g @anthropic-ai/claude-code",
+  "remoteUser": "vscode"
+}
